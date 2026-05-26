@@ -105,16 +105,6 @@ export default function App() {
       return;
     }
 
-    // 2. If Checkout Modal is open
-    if (isCheckoutOpen) {
-      tgBridge.showMainButton(
-        `Tasdiqlash (Olovli Buyurtma)`,
-        () => handlePlaceOrder()
-      );
-      tgBridge.showBackButton(() => setIsCheckoutOpen(false));
-      return;
-    }
-
     // 3. Main Views Navigation
     if (activeView === 'menu') {
       if (cartCount > 0) {
@@ -132,14 +122,7 @@ export default function App() {
       }
       tgBridge.hideBackButton();
     } else if (activeView === 'cart') {
-      if (cartCount > 0) {
-        tgBridge.showMainButton(
-          `Rasmiylashtirish (Buyurtma)`, 
-          () => setIsCheckoutOpen(true)
-        );
-      } else {
-        tgBridge.hideMainButton();
-      }
+      tgBridge.hideMainButton();
       tgBridge.showBackButton(() => setActiveView('menu'));
     } else if (activeView === 'admin-login') {
       tgBridge.hideMainButton();
@@ -366,7 +349,7 @@ export default function App() {
           </button>
           
           <div className="user-badge">
-           SizovDevs <span>{tgBridge.getUserInfo().first_name || 'Created by'}</span>
+            <span>{tgBridge.getUserInfo().first_name || 'Created by'}</span>
           </div>
         </div>
       </header>
@@ -381,7 +364,7 @@ export default function App() {
             <div className="promo-text">
               <h2>Mini App yasash Arzon va sifatli!</h2>
               <p>Ilk buyurtma uchun chegirma hoziroq bog'laning! <br />
-              <a href="tel:++998942014300" className='phone-links'>+998 94 201 43 00</a>
+              <a href="tel:+998942014300" className="phone-links">+998 94 201 43 00</a>
                
 
               </p>
@@ -490,14 +473,6 @@ export default function App() {
               })}
 
               <div className="bill-details">
-                <div className="bill-row">
-                  <span>Subtotal</span>
-                  <span>{cartSubtotal.toLocaleString('uz-UZ')} so'm</span>
-                </div>
-                <div className="bill-row">
-                  <span>Yetkazib berish ({deliveryMode === 'delivery' ? '3 km gacha' : 'Olib ketish'})</span>
-                  <span>{deliveryMode === 'delivery' ? `${deliveryFee.toLocaleString('uz-UZ')} so'm` : 'Bepul'}</span>
-                </div>
                 <div className="bill-row total">
                   <span>Jami summa</span>
                   <span>{cartGrandTotal.toLocaleString('uz-UZ')} so'm</span>
@@ -569,21 +544,9 @@ export default function App() {
             </button>
           )}
 
-          {!selectedProduct && isCheckoutOpen && (
-            <button className="web-button primary" onClick={handlePlaceOrder}>
-              Tasdiqlash (Olovli Buyurtma)
-            </button>
-          )}
-
-          {!selectedProduct && !isCheckoutOpen && activeView === 'menu' && cart.length > 0 && (
+          {!selectedProduct && activeView === 'menu' && cart.length > 0 && (
             <button className="web-button primary" onClick={() => switchViewNative('cart')}>
               Savatchani ko'rish ({cart.reduce((s, i) => s + i.quantity, 0)}) - {cartSubtotal.toLocaleString('uz-UZ')} so'm
-            </button>
-          )}
-
-          {!selectedProduct && !isCheckoutOpen && activeView === 'cart' && cart.length > 0 && (
-            <button className="web-button primary" onClick={() => setIsCheckoutOpen(true)}>
-              Rasmiylashtirish (Buyurtma)
             </button>
           )}
         </div>
@@ -669,100 +632,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 6. CHECKOUT MODAL OVERLAY */}
-      {isCheckoutOpen && (
-        <div className="modal-overlay" onClick={() => setIsCheckoutOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-drag-handle"></div>
-            
-            <div className="modal-header">
-              <div className="modal-title">
-                <h2>Yetkazib Berish</h2>
-                <p>Buyurtmani rasmiylashtirish</p>
-              </div>
-              <button className="close-modal-btn" onClick={() => setIsCheckoutOpen(false)}>×</button>
-            </div>
 
-            <div className="modal-body">
-              <form onSubmit={(e) => e.preventDefault()}>
-                
-                {/* Olish turi */}
-                <div className="form-group">
-                  <label>Olish Turi</label>
-                  <div className="delivery-options-grid">
-                    <div 
-                      className={`delivery-option-btn ${deliveryMode === 'delivery' ? 'active' : ''}`}
-                      onClick={() => { tgBridge.triggerHaptic('light'); setDeliveryMode('delivery'); }}
-                    >
-                      🚀 Yetkazish
-                    </div>
-                    <div 
-                      className={`delivery-option-btn ${deliveryMode === 'takeaway' ? 'active' : ''}`}
-                      onClick={() => { tgBridge.triggerHaptic('light'); setDeliveryMode('takeaway'); }}
-                    >
-                      🛍️ Olib ketish
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name */}
-                <div className="form-group">
-                  <label>Ismingiz</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Masalan: Dilshod" 
-                    value={checkoutName}
-                    onChange={(e) => setCheckoutName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* Phone */}
-                <div className="form-group">
-                  <label>Telefon Raqam</label>
-                  <input 
-                    type="tel" 
-                    className="form-input" 
-                    placeholder="+998 90 123 45 67" 
-                    value={checkoutPhone}
-                    onChange={(e) => setCheckoutPhone(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* Address */}
-                {deliveryMode === 'delivery' && (
-                  <div className="form-group">
-                    <label>Yetkazish Manzili</label>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      placeholder="Ko'cha, xonadon, mo'ljal" 
-                      value={checkoutAddress}
-                      onChange={(e) => setCheckoutAddress(e.target.value)}
-                      required
-                    />
-                  </div>
-                )}
-
-                {/* Comment */}
-                <div className="form-group">
-                  <label>Buyurtmaga Izoh (Ixtiyoriy)</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Piyozsiz bo'lsin, pishloq ko'proq bo'lsin" 
-                    value={checkoutComment}
-                    onChange={(e) => setCheckoutComment(e.target.value)}
-                  />
-                </div>
-
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 7. ORDER SUCCESS SCREEN WITH ANIMATED TIMELINE */}
       {activeOrder && (

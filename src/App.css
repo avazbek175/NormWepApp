@@ -48,10 +48,15 @@
 }
 
 .phone-links {
-  text-decoration: none;   /* pastki chiziqni olib tashlaydi */
-  color: #fc0707;             /* rang (o'zingizga moslab o'zgartiring) */
-  font-size: 16px;         /* kattalashtirish */
-  font-weight: 600;        /* biroz qalinroq qilish */
+  text-decoration: none;
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s ease;
+}
+.phone-links:hover {
+  opacity: 0.8;
 }
 body {
   font-family: var(--font-main);
